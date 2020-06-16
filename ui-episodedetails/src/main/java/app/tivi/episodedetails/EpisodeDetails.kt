@@ -77,12 +77,10 @@ import androidx.compose.ui.graphics.vector.VectorAsset
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.center
 import androidx.compose.ui.unit.dp
-import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.LiveData
 import androidx.ui.core.Alignment
 import androidx.ui.core.ConfigurationAmbient
 import androidx.ui.core.ContentScale
-import androidx.ui.core.DensityAmbient
 import androidx.ui.core.Modifier
 import androidx.ui.core.drawWithContent
 import androidx.ui.core.setContent
@@ -90,13 +88,14 @@ import androidx.ui.res.stringResource
 import androidx.ui.tooling.preview.Preview
 import app.tivi.common.compose.AutoSizedCircularProgressIndicator
 import app.tivi.common.compose.ExpandingText
-import app.tivi.common.compose.InsetsAmbient
-import app.tivi.common.compose.ProvideInsets
+import app.tivi.common.compose.ProvideDisplayInsets
 import app.tivi.common.compose.SwipeDirection
 import app.tivi.common.compose.SwipeToDismiss
 import app.tivi.common.compose.TiviAlertDialog
 import app.tivi.common.compose.TiviDateFormatterAmbient
 import app.tivi.common.compose.boundsInParent
+import app.tivi.common.compose.navigationBarHeight
+import app.tivi.common.compose.navigationBarPadding
 import app.tivi.common.compose.onPositionInParentChanged
 import app.tivi.data.entities.Episode
 import app.tivi.data.entities.EpisodeWatchEntry
@@ -118,13 +117,12 @@ import kotlin.math.hypot
  */
 fun ViewGroup.composeEpisodeDetails(
     state: LiveData<EpisodeDetailsViewState>,
-    insets: LiveData<WindowInsetsCompat?>,
     actioner: (EpisodeDetailsAction) -> Unit,
     tiviDateFormatter: TiviDateFormatter
 ): Any = setContent(Recomposer.current()) {
     MaterialThemeFromMdcTheme {
         Providers(TiviDateFormatterAmbient provides tiviDateFormatter) {
-            ProvideInsets(insets) {
+            ProvideDisplayInsets {
                 val viewState by state.observeAsState()
                 if (viewState != null) {
                     EpisodeDetails(viewState!!, actioner)
@@ -222,25 +220,17 @@ private fun EpisodeDetails(
                             )
                         }
 
-                        val bottomInset = with(DensityAmbient.current) {
-                            InsetsAmbient.current.bottom.toDp()
-                        }
-                        Spacer(
-                            modifier = Modifier.preferredHeight(bottomInset + 8.dp)
-                        )
+                        Spacer(Modifier.navigationBarHeight().padding(top = 8.dp))
                     }
                 }
             }
         }
 
-        val bottomInset = with(DensityAmbient.current) {
-            InsetsAmbient.current.bottom.toDp()
-        }
-
         Column(
             modifier = Modifier.fillMaxWidth()
                 .gravity(Alignment.BottomCenter)
-                .padding(bottom = 16.dp + bottomInset)
+                .navigationBarPadding()
+                .padding(bottom = 16.dp)
         ) {
             Crossfade(current = viewState.error) { error ->
                 if (error != null) {

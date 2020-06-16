@@ -44,7 +44,6 @@ import androidx.compose.material.icons.filled.Settings
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.graphics.vector.VectorAsset
 import androidx.compose.ui.unit.dp
-import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.LiveData
 import androidx.ui.core.Alignment
 import androidx.ui.core.Modifier
@@ -52,7 +51,7 @@ import androidx.ui.core.clip
 import androidx.ui.core.setContent
 import androidx.ui.res.stringResource
 import androidx.ui.tooling.preview.Preview
-import app.tivi.common.compose.ProvideInsets
+import app.tivi.common.compose.ProvideDisplayInsets
 import app.tivi.common.compose.TiviDateFormatterAmbient
 import app.tivi.common.compose.VectorImage
 import app.tivi.data.entities.TraktUser
@@ -66,13 +65,12 @@ import org.threeten.bp.ZoneOffset
 fun composeAccountUi(
     viewGroup: ViewGroup,
     state: LiveData<AccountUiViewState>,
-    insets: LiveData<WindowInsetsCompat?>,
     actioner: (AccountUiAction) -> Unit,
     tiviDateFormatter: TiviDateFormatter
 ): Any = viewGroup.setContent(Recomposer.current()) {
     MaterialThemeFromMdcTheme {
         Providers(TiviDateFormatterAmbient provides tiviDateFormatter) {
-            ProvideInsets(insets) {
+            ProvideDisplayInsets {
                 val viewState by state.observeAsState()
                 if (viewState != null) {
                     AccountUi(viewState!!, actioner)
